@@ -78,7 +78,7 @@ if(require.main == module) {
     program
         .option('-c, --checks <check_file>', 'Path to checks.json', clone(assertFileExists), CHECKSFILE_DEFAULT)
         .option('-f, --file <html_file>', 'Path to index.html', clone(assertFileExists), HTMLFILE_DEFAULT)
-	.option('-u, --url <url>', 'URL to index.html')
+	.option('-u, --url <url>', 'URL for html to check')
         .parse(process.argv);
     if(program.url) {
 	rest.get(program.url).on('complete', function(result) {
@@ -86,7 +86,10 @@ if(require.main == module) {
 		console.log('Error: ' + result.message);
 		this.retry(5000); // try again after 5 sec
 	    } else {
-		var checkJson = checkHtmlURL(result, program.checks);
+		fs.writeFileSync("result.html", result);
+    		var checkJson = checkHtmlFile(program.file, program.checks);    
+		var outJson = JSON.stringify(checkJson, null, 4);
+		console.log(outJson);
 	    }
 	});
     }
